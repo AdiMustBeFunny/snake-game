@@ -1,0 +1,35 @@
+﻿<Page x:Class="SnakeGame.Pages.GamePage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:SnakeGame.Pages"
+      xmlns:vm="clr-namespace:SnakeGame.ViewModels"
+      mc:Ignorable="d" 
+      d:DesignHeight="850" d:DesignWidth="1024"
+      Title="GamePage">
+    <Page.DataContext>
+        <vm:GamePageViewModel/>
+    </Page.DataContext>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="768px"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="Pause" FontSize="14" Command="{Binding GoBackComand}" Padding="20,0" Margin="10,5"/>
+            <Button Content="Go back" FontSize="14" Command="{Binding GoBackComand}" Padding="20,0" Margin="10,5"/>
+
+        </StackPanel>
+        <Canvas Grid.Row="1" Background="Bisque" x:Name="gameCanvas" Width="1024px" Focusable="True">
+            <Canvas.InputBindings>
+                <KeyBinding Key="W" Command="{Binding Key_W_PressedCommand}"/>
+                <KeyBinding Key="A" Command="{Binding Key_A_PressedCommand}"/>
+                <KeyBinding Key="S" Command="{Binding Key_S_PressedCommand}"/>
+                <KeyBinding Key="D" Command="{Binding Key_D_PressedCommand}"/>
+                <KeyBinding Key="Space" Command="{Binding Key_Space_PressedCommand}"/>
+            </Canvas.InputBindings>
+        </Canvas>
+    </Grid>
+</Page>
