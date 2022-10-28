@@ -11,7 +11,10 @@ namespace SnakeGame.Settings
         public static int GameWidth => 1024;
         public static int GameHeight => 768;
         public static int TileSize => 32;
+        public static int HorizontalTileCount => GameWidth / TileSize;
+        public static int VerticalTileCount => GameHeight / TileSize;
 
+        public static int OverlayZIndex => 10;
         public static int GridZIndex => 10;
         public static int PlayerZIndex => 9;
         public static int GameObjectZIndex => 8;

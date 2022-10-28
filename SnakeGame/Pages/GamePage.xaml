@@ -8,9 +8,12 @@
       mc:Ignorable="d" 
       d:DesignHeight="850" d:DesignWidth="1024"
       Title="GamePage">
-    <Page.DataContext>
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+    </Page.Resources>
+    <!--<Page.DataContext>
         <vm:GamePageViewModel/>
-    </Page.DataContext>
+    </Page.DataContext>-->
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -18,7 +21,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="Pause" FontSize="14" Command="{Binding GoBackComand}" Padding="20,0" Margin="10,5"/>
+            <Button Content="Toogle Pause" FontSize="14" IsEnabled="{Binding ToogleEnabled, UpdateSourceTrigger=PropertyChanged}" Command="{Binding TooglePauseComand}" Padding="20,0" Margin="10,5"/>
             <Button Content="Go back" FontSize="14" Command="{Binding GoBackComand}" Padding="20,0" Margin="10,5"/>
 
         </StackPanel>
@@ -30,6 +33,13 @@
                 <KeyBinding Key="D" Command="{Binding Key_D_PressedCommand}"/>
                 <KeyBinding Key="Space" Command="{Binding Key_Space_PressedCommand}"/>
             </Canvas.InputBindings>
+
+            <Label HorizontalAlignment="Center"
+                   FontSize="50"
+                   Canvas.Left="300"
+                   Canvas.Top="300"
+                   Content="{Binding OverlayText}"
+                   Visibility="{Binding ShowOverlay,Converter={StaticResource BoolToVisibility}}"/>
         </Canvas>
     </Grid>
 </Page>

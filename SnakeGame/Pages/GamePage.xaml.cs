@@ -27,36 +27,10 @@ namespace SnakeGame.Pages
         {
             InitializeComponent();
 
-            var grid = GameGridProvider.Get();
+            var vm = new GamePageViewModel(gameCanvas);
+            vm.Initialize();
 
-            foreach(var line in grid)
-            {
-                gameCanvas.Children.Add(line);
-            }
-
-            var rec = new Rectangle();
-            rec.Stroke = Brushes.LightSteelBlue;
-            rec.Width = 32;
-            rec.Height = 32;
-            rec.StrokeThickness = 1;
-            rec.Fill = Brushes.LightSteelBlue;
-
-            Canvas.SetZIndex(rec, 11);
-            Canvas.SetLeft(rec, 0);
-            Canvas.SetTop(rec, 32);
-            gameCanvas.Children.Add(rec);
-            //CompositionTarget.Rendering += Loop;
-
-            var vm = DataContext as GamePageViewModel;
-            vm._canvas = gameCanvas;
-            vm.player = rec;
-            gameCanvas.Focus();
-
-        }
-
-        void Loop(object sender, EventArgs e)
-        {
-            Trace.WriteLine("hi");
+            DataContext = vm;
         }
     }
 }
