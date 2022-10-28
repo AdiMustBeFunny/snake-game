@@ -21,9 +21,10 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Label FontSize="14" Content="Score:" Padding="0,0" Margin="0,13"/>
+            <Label FontSize="14" Content="{Binding Score}" Padding="0,0" Margin="10,13"/>
             <Button Content="Toogle Pause" FontSize="14" IsEnabled="{Binding ToogleEnabled, UpdateSourceTrigger=PropertyChanged}" Command="{Binding TooglePauseComand}" Padding="20,0" Margin="10,5"/>
             <Button Content="Go back" FontSize="14" Command="{Binding GoBackComand}" Padding="20,0" Margin="10,5"/>
-
         </StackPanel>
         <Canvas Grid.Row="1" Background="Bisque" x:Name="gameCanvas" Width="1024px" Focusable="True">
             <Canvas.InputBindings>
@@ -39,7 +40,17 @@
                    Canvas.Left="300"
                    Canvas.Top="300"
                    Content="{Binding OverlayText}"
+                   Panel.ZIndex="100"
+                   Foreground="AntiqueWhite"
                    Visibility="{Binding ShowOverlay,Converter={StaticResource BoolToVisibility}}"/>
+            <Label HorizontalAlignment="Center"
+                   FontSize="50"
+                   Canvas.Left="300"
+                   Canvas.Top="400"
+                   Content="Move with - W, A, S, D"
+                   Panel.ZIndex="100"
+                   Foreground="AntiqueWhite"
+                   Visibility="{Binding ShowHelp,Converter={StaticResource BoolToVisibility}}"/>
         </Canvas>
     </Grid>
 </Page>

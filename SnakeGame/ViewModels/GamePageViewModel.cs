@@ -2,6 +2,7 @@
 using SnakeGame.Helpers;
 using SnakeGame.ViewModels.Base;
 using System;
+using System.Media;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Navigation;
@@ -24,25 +25,6 @@ namespace SnakeGame.ViewModels
             _timer = new DispatcherTimer();
         }
 
-        public void Initialize()
-        {
-            _gameController.Initialize();
-            _timer.Tick += gameTick;
-            _timer.Interval = TimeSpan.FromMilliseconds(100);
-            //_timer.Start();
-            _canvas.Focus();
-        }
-
-        private void gameTick(object sender, EventArgs e)
-        {
-            var gameState = _gameController.GameTick();
-
-            if(gameState == GameCore.Objects.EGameState.PlayerLost)
-            {
-                _timer.Stop();
-            }
-        }
-
         private bool _toogleEnabled;
         public bool ToogleEnabled
         {
@@ -55,6 +37,7 @@ namespace SnakeGame.ViewModels
         }
 
         private bool _showOverlay = true;
+
         public bool ShowOverlay
         {
             get { return _showOverlay; }
@@ -65,7 +48,20 @@ namespace SnakeGame.ViewModels
             }
         }
 
+        private bool _showHelp = true;
+
+        public bool ShowHelp
+        {
+            get { return _showHelp; }
+            set
+            {
+                _showHelp = value;
+                Set(nameof(ShowHelp));
+            }
+        }
+
         private string _overlayText = "Press space to start";
+
         public string OverlayText
         {
             get { return _overlayText; }
@@ -73,6 +69,18 @@ namespace SnakeGame.ViewModels
             {
                 _overlayText = value;
                 Set(nameof(OverlayText));
+            }
+        }
+
+        private int _score = 0;
+
+        public int Score
+        {
+            get { return _score; }
+            set
+            {
+                _score = value;
+                Set(nameof(Score));
             }
         }
 
@@ -93,6 +101,7 @@ namespace SnakeGame.ViewModels
             }
             _gameController.NotifyDirectionChange(ConsoleKey.W);
         }
+
         public void Key_A_Pressed()
         {
             if (!_timer.IsEnabled)
@@ -101,6 +110,7 @@ namespace SnakeGame.ViewModels
             }
             _gameController.NotifyDirectionChange(ConsoleKey.A);
         }
+
         public void Key_S_Pressed()
         {
             if (!_timer.IsEnabled)
@@ -108,8 +118,8 @@ namespace SnakeGame.ViewModels
                 return;
             }
             _gameController.NotifyDirectionChange(ConsoleKey.S);
-
         }
+
         public void Key_D_Pressed()
         {
             if (!_timer.IsEnabled)
@@ -118,8 +128,10 @@ namespace SnakeGame.ViewModels
             }
             _gameController.NotifyDirectionChange(ConsoleKey.D);
         }
+
         public void Key_Space_Pressed()
         {
+            ShowHelp = false;
             if (!ToogleEnabled)
             {
                 ToogleEnabled = true;
@@ -144,12 +156,14 @@ namespace SnakeGame.ViewModels
                 _timer.Start();
             }
         }
+
         public void GoBack()
         {
             //dispose of the game here
             _timer.Stop();
             _navigationService.GoBack();
         }
+
         public void TooglePause()
         {
             if(_timer.IsEnabled){
@@ -165,6 +179,31 @@ namespace SnakeGame.ViewModels
                 _timer.Start();
             }
             _canvas.Focus();
+        }
+
+        public void Initialize()
+        {
+            _gameController.Initialize();
+            _timer.Tick += gameTick;
+            _timer.Interval = TimeSpan.FromMilliseconds(100);
+            _canvas.Focus();
+        }
+
+        private void gameTick(object sender, EventArgs e)
+        {
+            var gameState = _gameController.GameTick();
+
+            if (gameState == GameCore.Objects.EGameState.PlayerLost)
+            {
+                ShowOverlay = true;
+                OverlayText = $"You have lost. Your score: {Score}";
+                _timer.Stop();
+            }
+            else if (gameState == GameCore.Objects.EGameState.FruitCollected)
+            {
+                SystemSounds.Beep.Play();
+                Score++;
+            }
         }
     }
 }

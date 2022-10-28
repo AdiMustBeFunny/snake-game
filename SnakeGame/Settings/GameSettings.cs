@@ -8,15 +8,15 @@ namespace SnakeGame.Settings
 {
     public class GameSettings
     {
-        public static int GameWidth => 1024;
-        public static int GameHeight => 768;
-        public static int TileSize => 32;
+        public const int GameWidth = 1024;
+        public const int GameHeight = 768;
+        public const int TileSize = 32;
         public static int HorizontalTileCount => GameWidth / TileSize;
         public static int VerticalTileCount => GameHeight / TileSize;
 
-        public static int OverlayZIndex => 10;
-        public static int GridZIndex => 10;
-        public static int PlayerZIndex => 9;
-        public static int GameObjectZIndex => 8;
+        public const int OverlayZIndex = 10;
+        public const int GridZIndex = 10;
+        public const int PlayerZIndex = 9;
+        public const int GameObjectZIndex = 8;
     }
 }

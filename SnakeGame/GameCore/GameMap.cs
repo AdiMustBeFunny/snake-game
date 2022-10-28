@@ -31,7 +31,6 @@ namespace SnakeGame.GameCore
                 }
             }
 
-            Map[3][3] = new FruitObject(3, 3);
             Map[5][5] = new WallObject(3, 3);
         }
     }

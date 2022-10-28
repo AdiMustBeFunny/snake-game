@@ -24,7 +24,6 @@ namespace SnakeGame.GameCore
         private List<Rectangle> _fruitRectangles { get; set; }
         private List<Rectangle> _wallRectangles { get; set; }
         private Rectangle _overlayRectangle { get; set; }
-        private bool _overlayHidden { get; set; }
         private GameMap _gameMap { get; set; }
         public EGameState GameState { get; set; }
 
@@ -40,26 +39,29 @@ namespace SnakeGame.GameCore
             CreatePlayer();
             CreateGrid();
             CreateMap();
+            SpawnNewFruit();
             CreateOverlay();
 
             GameState = EGameState.Continue;
-            _canvas.Focus();
         }
 
         private void CreateOverlay()
         {
-            _overlayRectangle = CreateRect(0, 0, new SolidColorBrush(Color.FromArgb(80, 2, 2, 2)), 1024, 768);
+            _overlayRectangle = CreateRect(0,
+                0,
+                new SolidColorBrush(Color.FromArgb(180, 2, 2, 2)),
+                GameSettings.GameWidth,
+                GameSettings.GameHeight,
+                GameSettings.OverlayZIndex);
             _canvas.Children.Add(_overlayRectangle);
         }
 
         public void ShowOverlay()
         {
-            _overlayHidden = false;
             _canvas.Children.Add(_overlayRectangle);
         }
         public void HideOverlay()
         {
-            _overlayHidden = true;
             _canvas.Children.Remove(_overlayRectangle);
         }
 
@@ -123,7 +125,7 @@ namespace SnakeGame.GameCore
             }
         }
 
-        private Rectangle CreateRect(int x, int y, SolidColorBrush brush, int width = 32, int height = 32)
+        private Rectangle CreateRect(int x, int y, SolidColorBrush brush, int width = 32, int height = 32, int zIndex = GameSettings.GameObjectZIndex)
         {
             var rect = new Rectangle();
             rect.Fill = brush;
@@ -138,6 +140,7 @@ namespace SnakeGame.GameCore
         public EGameState GameTick()
         {
             //make an object for these values and separate logic into seperate methods at least
+            GameState = EGameState.Continue;
             var first = _player.Body.First;
             var last = _player.Body.Last;
             var oldX = last.Value.X;
@@ -206,12 +209,15 @@ namespace SnakeGame.GameCore
                     Canvas.SetLeft(newRect, oldX * 32);
                     Canvas.SetTop(newRect, oldY * 32);
                     _canvas.Children.Add(newRect);
-                }
-            }
 
-            if (_gameMap.Map[last.Value.X][last.Value.Y].ObjectType == EGameObjectType.Wall)
+                    //SpawnNewFruit
+                    SpawnNewFruit();
+                    GameState = EGameState.FruitCollected;
+                }
+            } else if (_gameMap.Map[last.Value.X][last.Value.Y].ObjectType == EGameObjectType.Wall)
             {
                 GameState = EGameState.PlayerLost;
+                ShowOverlay();
                 return GameState;
             }
 
@@ -232,11 +238,55 @@ namespace SnakeGame.GameCore
                 }
                 if(snakeObject.X == head.X && snakeObject.Y == head.Y)
                 {
+                    ShowOverlay();
                     GameState = EGameState.PlayerLost;
                 }
             }
 
             return GameState;
+        }
+
+        private void SpawnNewFruit()
+        {
+            List<Point> forbiddenLocations = new List<Point>();
+            foreach(var column in _gameMap.Map)
+            {
+                foreach (var cell in column)
+                {
+                    if(cell.ObjectType == EGameObjectType.Wall)
+                    {
+                        forbiddenLocations.Add(new Point(cell.X, cell.Y));
+                    }
+                }
+            }
+
+            foreach(var snakeCell in _player.Body)
+            {
+                forbiddenLocations.Add(new Point(snakeCell.X, snakeCell.Y));
+            }
+
+            bool generatedFruit = false;
+            var rnd = new Random();
+
+            while(!generatedFruit)
+            {
+                var newX = rnd.Next(0, _gameMap.Width - 1);
+                var newY = rnd.Next(0, _gameMap.Height - 1);
+
+                if (forbiddenLocations.Count(cell => cell.X == newX || cell.Y == newY) > 0)
+                {
+                    continue;
+                }
+
+                _gameMap.Map[newX][newY] = new FruitObject(newX, newY);
+
+                var fruitRect = CreateRect(newX, newY, new SolidColorBrush(Colors.Green));
+                _fruitRectangles.Add(fruitRect);
+                _canvas.Children.Add(fruitRect);
+
+                generatedFruit = true;
+            }
+
         }
 
         public void NotifyDirectionChange(ConsoleKey key)

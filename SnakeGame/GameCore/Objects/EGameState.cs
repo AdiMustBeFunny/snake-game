@@ -9,6 +9,7 @@ namespace SnakeGame.GameCore.Objects
     public enum EGameState
     {
         Continue,
-        PlayerLost
+        PlayerLost,
+        FruitCollected
     }
 }
