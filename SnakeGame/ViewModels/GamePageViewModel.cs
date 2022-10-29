@@ -1,10 +1,14 @@
-﻿using SnakeGame.GameCore;
+﻿using SnakeGame.Drawing;
+using SnakeGame.GameCore;
 using SnakeGame.Helpers;
+using SnakeGame.Settings;
 using SnakeGame.ViewModels.Base;
 using System;
 using System.Media;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Navigation;
 using System.Windows.Threading;
 
@@ -14,6 +18,7 @@ namespace SnakeGame.ViewModels
     {
         private readonly NavigationService _navigationService;
         private readonly DispatcherTimer _timer;
+        private TextBlock _overlayTextBlock;
         private readonly GameController _gameController;
         public Canvas _canvas { get; set; }
 
@@ -33,42 +38,6 @@ namespace SnakeGame.ViewModels
             { 
                 _toogleEnabled = value;
                 Set(nameof(ToogleEnabled));
-            }
-        }
-
-        private bool _showOverlay = true;
-
-        public bool ShowOverlay
-        {
-            get { return _showOverlay; }
-            set
-            {
-                _showOverlay = value;
-                Set(nameof(ShowOverlay));
-            }
-        }
-
-        private bool _showHelp = true;
-
-        public bool ShowHelp
-        {
-            get { return _showHelp; }
-            set
-            {
-                _showHelp = value;
-                Set(nameof(ShowHelp));
-            }
-        }
-
-        private string _overlayText = "Press space to start";
-
-        public string OverlayText
-        {
-            get { return _overlayText; }
-            set
-            {
-                _overlayText = value;
-                Set(nameof(OverlayText));
             }
         }
 
@@ -131,29 +100,28 @@ namespace SnakeGame.ViewModels
 
         public void Key_Space_Pressed()
         {
-            ShowHelp = false;
-            if (!ToogleEnabled)
-            {
-                ToogleEnabled = true;
-            }
-            
-
             if (_gameController.GameState == GameCore.Objects.EGameState.PlayerLost)
             {
+                RestartGame();
                 return;
             }
             else if (_timer.IsEnabled)
             {
-                OverlayText = "Press space to unpause";
-                ShowOverlay = true;
+                _overlayTextBlock.Text = "Press space to unpause";
+                _overlayTextBlock.Visibility = Visibility.Visible;
                 _gameController.ShowOverlay();
                 _timer.Stop();
             }
             else
             {
-                ShowOverlay = false;
                 _gameController.HideOverlay();
+                _overlayTextBlock.Visibility = Visibility.Hidden;
                 _timer.Start();
+            }
+
+            if (!ToogleEnabled)
+            {
+                ToogleEnabled = true;
             }
         }
 
@@ -167,14 +135,14 @@ namespace SnakeGame.ViewModels
         public void TooglePause()
         {
             if(_timer.IsEnabled){
-                OverlayText = "Press space to unpause";
-                ShowOverlay = true;
+                _overlayTextBlock.Text = "Press space to unpause";
+                _overlayTextBlock.Visibility = Visibility.Visible;
                 _gameController.ShowOverlay();
                 _timer.Stop();
             }
             else if(_gameController.GameState != GameCore.Objects.EGameState.PlayerLost)
             {
-                ShowOverlay = false;
+                _overlayTextBlock.Visibility = Visibility.Hidden;
                 _gameController.HideOverlay();
                 _timer.Start();
             }
@@ -183,10 +151,26 @@ namespace SnakeGame.ViewModels
 
         public void Initialize()
         {
+            _canvas.Children.Clear();
+            Score = 0;
+
             _gameController.Initialize();
+            _overlayTextBlock = OverlayTextBlockProvider.Get("Press space to start\nMove with - W, A, S, D");
+            _canvas.Children.Add(_overlayTextBlock);
+
             _timer.Tick += gameTick;
             _timer.Interval = TimeSpan.FromMilliseconds(100);
             _canvas.Focus();
+        }
+
+        public void RestartGame()
+        {
+            _timer.Tick -= gameTick;
+            Initialize();
+            _gameController.HideOverlay();
+            _overlayTextBlock.Visibility = Visibility.Hidden;
+            ToogleEnabled = true;
+            _timer.Start();
         }
 
         private void gameTick(object sender, EventArgs e)
@@ -195,8 +179,11 @@ namespace SnakeGame.ViewModels
 
             if (gameState == GameCore.Objects.EGameState.PlayerLost)
             {
-                ShowOverlay = true;
-                OverlayText = $"You have lost. Your score: {Score}";
+                _canvas.Children.Remove(_overlayTextBlock);
+                _overlayTextBlock = OverlayTextBlockProvider.Get($"You have lost.\nYour score: {Score}.\nPress space to restart the game");
+                _overlayTextBlock.Visibility = Visibility.Visible;
+                _canvas.Children.Add(_overlayTextBlock);
+                ToogleEnabled = false;
                 _timer.Stop();
             }
             else if (gameState == GameCore.Objects.EGameState.FruitCollected)

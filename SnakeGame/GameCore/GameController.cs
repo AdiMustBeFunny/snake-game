@@ -24,7 +24,6 @@ namespace SnakeGame.GameCore
         private LinkedList<Rectangle> _playerRectangles { get; set; }
         private LinkedList<EMovementDirection> _directions { get; set; }
         private Rectangle _fruitRectangle { get; set; }
-        private List<Rectangle> _wallRectangles { get; set; }
         private Rectangle _overlayRectangle { get; set; }
         private GameMap _gameMap { get; set; }
         public EGameState GameState { get; set; }
@@ -69,7 +68,7 @@ namespace SnakeGame.GameCore
 
         private void CreateOverlay()
         {
-            _overlayRectangle = CreateRect(0,
+            _overlayRectangle = TileBuilder.Build(0,
                 0,
                 new SolidColorBrush(Color.FromArgb(180, 2, 2, 2)),
                 GameSettings.GameWidth,
@@ -89,19 +88,9 @@ namespace SnakeGame.GameCore
 
         private void CreateMap()
         {
-            _wallRectangles = new List<Rectangle>();
-            for (int x = 0; x < _gameMap.Width; x++)
-            {
-                for (int y = 0; y < _gameMap.Height; y++)
-                {
-                    if (_gameMap.Map[x][y].ObjectType == EGameObjectType.Wall)
-                    {
-                        _wallRectangles.Add(CreateRect(x, y, new SolidColorBrush(Colors.Gray)));
-                    }
-                }
-            }
+            var wallRectangles = MapWallsProvider.Get(_gameMap);
 
-            foreach (var item in _wallRectangles)
+            foreach (var item in wallRectangles)
             {
                 _canvas.Children.Add(item);
             }
@@ -119,10 +108,10 @@ namespace SnakeGame.GameCore
 
             _playerRectangles = new LinkedList<Rectangle>();
 
-            _playerRectangles.AddFirst(CreateRect(3, 3, new SolidColorBrush(Colors.Red)));
-            _playerRectangles.AddFirst(CreateRect(4, 3, new SolidColorBrush(Colors.Red)));
-            _playerRectangles.AddFirst(CreateRect(5, 3, new SolidColorBrush(Colors.Red)));
-            _playerRectangles.AddFirst(CreateRect(6, 3, new SolidColorBrush(Colors.Red)));
+            _playerRectangles.AddFirst(TileBuilder.Build(3, 3, new SolidColorBrush(Colors.Red)));
+            _playerRectangles.AddFirst(TileBuilder.Build(4, 3, new SolidColorBrush(Colors.Red)));
+            _playerRectangles.AddFirst(TileBuilder.Build(5, 3, new SolidColorBrush(Colors.Red)));
+            _playerRectangles.AddFirst(TileBuilder.Build(6, 3, new SolidColorBrush(Colors.Red)));
 
             foreach (var item in _playerRectangles)
             {
@@ -138,18 +127,6 @@ namespace SnakeGame.GameCore
             {
                 _canvas.Children.Add(line);
             }
-        }
-
-        private Rectangle CreateRect(int x, int y, SolidColorBrush brush, int width = 32, int height = 32, int zIndex = GameSettings.GameObjectZIndex)
-        {
-            var rect = new Rectangle();
-            rect.Fill = brush;
-            rect.Width = width;
-            rect.Height = height;
-            Canvas.SetLeft(rect, x * width);
-            Canvas.SetTop(rect, y * height);
-            Canvas.SetZIndex(rect, GameSettings.GameObjectZIndex);
-            return rect;
         }
 
         public EGameState GameTick()
@@ -215,7 +192,7 @@ namespace SnakeGame.GameCore
                 
                 _canvas.Children.Remove(_fruitRectangle);
                 _player.Body.AddLast(new SnakeObject(oldX, oldY));
-                var newRect = CreateRect(oldX, oldY, new SolidColorBrush(Colors.Red));
+                var newRect = TileBuilder.Build(oldX, oldY, new SolidColorBrush(Colors.Red));
                 _playerRectangles.AddLast(newRect);
 
                 Canvas.SetLeft(newRect, oldX * 32);
@@ -295,7 +272,7 @@ namespace SnakeGame.GameCore
 
                 _gameMap.Map[newX][newY] = new FruitObject(newX, newY);
 
-                _fruitRectangle = CreateRect(newX, newY, new SolidColorBrush(Colors.Green));
+                _fruitRectangle = TileBuilder.Build(newX, newY, new SolidColorBrush(Colors.Green));
                 _canvas.Children.Add(_fruitRectangle);
 
                 generatedFruit = true;

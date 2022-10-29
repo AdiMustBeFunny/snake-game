@@ -14,7 +14,8 @@ namespace SnakeGame.Settings
         public static int HorizontalTileCount => GameWidth / TileSize;
         public static int VerticalTileCount => GameHeight / TileSize;
 
-        public const int OverlayZIndex = 10;
+        public const int OverlayTextZIndex = 12;
+        public const int OverlayZIndex = 11;
         public const int GridZIndex = 10;
         public const int PlayerZIndex = 9;
         public const int GameObjectZIndex = 8;

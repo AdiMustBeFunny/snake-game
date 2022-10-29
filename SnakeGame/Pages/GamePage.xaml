@@ -35,7 +35,7 @@
                 <KeyBinding Key="Space" Command="{Binding Key_Space_PressedCommand}"/>
             </Canvas.InputBindings>
 
-            <Label HorizontalAlignment="Center"
+            <!--<Label HorizontalAlignment="Center"
                    FontSize="50"
                    Canvas.Left="300"
                    Canvas.Top="300"
@@ -50,7 +50,7 @@
                    Content="Move with - W, A, S, D"
                    Panel.ZIndex="100"
                    Foreground="AntiqueWhite"
-                   Visibility="{Binding ShowHelp,Converter={StaticResource BoolToVisibility}}"/>
+                   Visibility="{Binding ShowHelp,Converter={StaticResource BoolToVisibility}}"/>-->
         </Canvas>
     </Grid>
 </Page>
