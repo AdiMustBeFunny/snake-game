@@ -33,14 +33,6 @@ namespace SnakeGame.GameCore
             _canvas = canvas;
             _gameMap = new GameMap(GameSettings.HorizontalTileCount,GameSettings.VerticalTileCount);
             _directions = new LinkedList<EMovementDirection>();
-
-            //var map = _gameMap.ToExportData();
-            //var str = JsonConvert.SerializeObject(map);
-            //File.WriteAllText("file.json", str);
-
-            //var str2 = File.ReadAllText("file.json");
-            //var map2 = JsonConvert.DeserializeObject<GameMapExportObject>(str2);
-            //_gameMap.Load(map2);
         }
 
         public void Initialize()
@@ -81,6 +73,7 @@ namespace SnakeGame.GameCore
         {
             _canvas.Children.Add(_overlayRectangle);
         }
+
         public void HideOverlay()
         {
             _canvas.Children.Remove(_overlayRectangle);
@@ -131,13 +124,13 @@ namespace SnakeGame.GameCore
 
         public EGameState GameTick()
         {
-            //make an object for these values and separate logic into seperate methods at least
             GameState = EGameState.Continue;
             var first = _player.Body.First;
             var last = _player.Body.Last;
             var oldX = last.Value.X;
             var oldY = last.Value.Y;
 
+            //last element will now be the first element
             last.Value.X = first.Value.X;
             last.Value.Y = first.Value.Y;
 

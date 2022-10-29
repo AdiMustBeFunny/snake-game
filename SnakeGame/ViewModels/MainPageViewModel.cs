@@ -20,18 +20,8 @@ namespace SnakeGame.ViewModels
         }
 
         public ICommand NavigateToGameCommand => new RelayCommand(NavigateToGame);
-        public ICommand NavigateToLevelDesignerCommand => new RelayCommand(NavigateToGame);
-        public ICommand NavigateToSelectLevelCommand => new RelayCommand(NavigateToGame);
 
         public void NavigateToGame()
-        {
-            _navigationService.Navigate(new GamePage());
-        }
-        public void NavigateToLevelDesigner()
-        {
-            _navigationService.Navigate(new GamePage());
-        }
-        public void NavigateToSelectLevel()
         {
             _navigationService.Navigate(new GamePage());
         }

@@ -33,24 +33,8 @@
                 <KeyBinding Key="S" Command="{Binding Key_S_PressedCommand}"/>
                 <KeyBinding Key="D" Command="{Binding Key_D_PressedCommand}"/>
                 <KeyBinding Key="Space" Command="{Binding Key_Space_PressedCommand}"/>
+                <MouseBinding Gesture="LeftClick" Command="{Binding FocusCanvasCommand}" />
             </Canvas.InputBindings>
-
-            <!--<Label HorizontalAlignment="Center"
-                   FontSize="50"
-                   Canvas.Left="300"
-                   Canvas.Top="300"
-                   Content="{Binding OverlayText}"
-                   Panel.ZIndex="100"
-                   Foreground="AntiqueWhite"
-                   Visibility="{Binding ShowOverlay,Converter={StaticResource BoolToVisibility}}"/>
-            <Label HorizontalAlignment="Center"
-                   FontSize="50"
-                   Canvas.Left="300"
-                   Canvas.Top="400"
-                   Content="Move with - W, A, S, D"
-                   Panel.ZIndex="100"
-                   Foreground="AntiqueWhite"
-                   Visibility="{Binding ShowHelp,Converter={StaticResource BoolToVisibility}}"/>-->
         </Canvas>
     </Grid>
 </Page>

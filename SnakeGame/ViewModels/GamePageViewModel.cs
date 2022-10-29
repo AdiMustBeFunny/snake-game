@@ -61,6 +61,12 @@ namespace SnakeGame.ViewModels
         public ICommand Key_S_PressedCommand => new RelayCommand(Key_S_Pressed);
         public ICommand Key_D_PressedCommand => new RelayCommand(Key_D_Pressed);
         public ICommand Key_Space_PressedCommand => new RelayCommand(Key_Space_Pressed);
+        public ICommand FocusCanvasCommand => new RelayCommand(FocusCanvas);
+
+        private void FocusCanvas()
+        {
+            _canvas.Focus();
+        }
 
         public void Key_W_Pressed()
         {

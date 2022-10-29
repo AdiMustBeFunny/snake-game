@@ -7,18 +7,13 @@
       xmlns:vm="clr-namespace:SnakeGame.ViewModels"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
+      Background="Bisque"
       Title="MainPage">
     <Page.DataContext>
         <vm:MainPageViewModel/>
     </Page.DataContext>
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition/>
-            <RowDefinition/>
-        </Grid.RowDefinitions>
-        <Button Content="New Game" Command="{Binding NavigateToGameCommand}" FontSize="50"  Grid.Row="0"/>
-        <Button Content="Select Level" FontSize="50" Command="{Binding NavigateToSelectLevelCommand}" Grid.Row="1"/>
-        <Button Content="Level Editor" FontSize="50" Command="{Binding NavigateToLevelDesignerCommand}" Grid.Row="2"/>
-    </Grid>
+    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" >
+        <TextBlock Text="Snake - Computer Game" FontSize="50" Margin="0,0,0,150"/>
+        <Button Content="New Game" Command="{Binding NavigateToGameCommand}" FontSize="24" Padding="10"/>
+    </StackPanel>
 </Page>
