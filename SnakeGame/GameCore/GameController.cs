@@ -1,10 +1,12 @@
-﻿using SnakeGame.Drawing;
+﻿using Newtonsoft.Json;
+using SnakeGame.Drawing;
 using SnakeGame.GameCore.Objects;
 using SnakeGame.GameCore.Objects.Base;
 using SnakeGame.Settings;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,7 +23,7 @@ namespace SnakeGame.GameCore
         private SnakePlayer _player { get; set; }
         private LinkedList<Rectangle> _playerRectangles { get; set; }
         private LinkedList<EMovementDirection> _directions { get; set; }
-        private List<Rectangle> _fruitRectangles { get; set; }
+        private Rectangle _fruitRectangle { get; set; }
         private List<Rectangle> _wallRectangles { get; set; }
         private Rectangle _overlayRectangle { get; set; }
         private GameMap _gameMap { get; set; }
@@ -32,10 +34,30 @@ namespace SnakeGame.GameCore
             _canvas = canvas;
             _gameMap = new GameMap(GameSettings.HorizontalTileCount,GameSettings.VerticalTileCount);
             _directions = new LinkedList<EMovementDirection>();
+
+            //var map = _gameMap.ToExportData();
+            //var str = JsonConvert.SerializeObject(map);
+            //File.WriteAllText("file.json", str);
+
+            //var str2 = File.ReadAllText("file.json");
+            //var map2 = JsonConvert.DeserializeObject<GameMapExportObject>(str2);
+            //_gameMap.Load(map2);
         }
 
         public void Initialize()
         {
+            try
+            {
+                var levelAsString = File.ReadAllText("Resources/Maps/level1.json");
+                var mapExportObject = JsonConvert.DeserializeObject<GameMapExportObject>(levelAsString);
+                _gameMap.Load(mapExportObject);
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(ex.ToString());
+            }
+
+
             CreatePlayer();
             CreateGrid();
             CreateMap();
@@ -67,25 +89,18 @@ namespace SnakeGame.GameCore
 
         private void CreateMap()
         {
-            _fruitRectangles = new List<Rectangle>();
             _wallRectangles = new List<Rectangle>();
             for (int x = 0; x < _gameMap.Width; x++)
             {
                 for (int y = 0; y < _gameMap.Height; y++)
                 {
-                    if (_gameMap.Map[x][y].ObjectType == EGameObjectType.Fruit)
-                    {
-                        _fruitRectangles.Add(CreateRect(x, y, new SolidColorBrush(Colors.Green)));
-                    } else if (_gameMap.Map[x][y].ObjectType == EGameObjectType.Wall)
+                    if (_gameMap.Map[x][y].ObjectType == EGameObjectType.Wall)
                     {
                         _wallRectangles.Add(CreateRect(x, y, new SolidColorBrush(Colors.Gray)));
                     }
                 }
             }
-            foreach (var item in _fruitRectangles)
-            {
-                _canvas.Children.Add(item);
-            }
+
             foreach (var item in _wallRectangles)
             {
                 _canvas.Children.Add(item);
@@ -197,30 +212,30 @@ namespace SnakeGame.GameCore
             if (_gameMap.Map[last.Value.X][last.Value.Y].ObjectType == EGameObjectType.Fruit)
             {
                 _gameMap.Map[last.Value.X][last.Value.Y] = new EmptyObject(last.Value.X, last.Value.Y);
-                var fruitToDelete = _fruitRectangles
-                    .FirstOrDefault(rec => Canvas.GetLeft(rec) / 32 == last.Value.X && Canvas.GetTop(rec) / 32 == last.Value.Y);
-                if(fruitToDelete != null)
-                {
-                    _canvas.Children.Remove(fruitToDelete);
-                    _player.Body.AddLast(new SnakeObject(oldX, oldY));
-                    var newRect = CreateRect(oldX, oldY, new SolidColorBrush(Colors.Red));
-                    _playerRectangles.AddLast(newRect);
+                
+                _canvas.Children.Remove(_fruitRectangle);
+                _player.Body.AddLast(new SnakeObject(oldX, oldY));
+                var newRect = CreateRect(oldX, oldY, new SolidColorBrush(Colors.Red));
+                _playerRectangles.AddLast(newRect);
 
-                    Canvas.SetLeft(newRect, oldX * 32);
-                    Canvas.SetTop(newRect, oldY * 32);
-                    _canvas.Children.Add(newRect);
+                Canvas.SetLeft(newRect, oldX * 32);
+                Canvas.SetTop(newRect, oldY * 32);
+                _canvas.Children.Add(newRect);
 
-                    //SpawnNewFruit
-                    SpawnNewFruit();
-                    GameState = EGameState.FruitCollected;
-                }
-            } else if (_gameMap.Map[last.Value.X][last.Value.Y].ObjectType == EGameObjectType.Wall)
+                //SpawnNewFruit
+                SpawnNewFruit();
+                GameState = EGameState.FruitCollected;
+                
+            } 
+            //hit wall
+            else if (_gameMap.Map[last.Value.X][last.Value.Y].ObjectType == EGameObjectType.Wall)
             {
                 GameState = EGameState.PlayerLost;
                 ShowOverlay();
                 return GameState;
             }
 
+            //last ractangle will now be the first one
             var lastRect = _playerRectangles.Last;
             _playerRectangles.RemoveLast();
             Canvas.SetLeft(lastRect.Value, last.Value.X * 32);
@@ -273,16 +288,15 @@ namespace SnakeGame.GameCore
                 var newX = rnd.Next(0, _gameMap.Width - 1);
                 var newY = rnd.Next(0, _gameMap.Height - 1);
 
-                if (forbiddenLocations.Count(cell => cell.X == newX || cell.Y == newY) > 0)
+                if (forbiddenLocations.Count(cell => cell.X == newX && cell.Y == newY) > 0)
                 {
                     continue;
                 }
 
                 _gameMap.Map[newX][newY] = new FruitObject(newX, newY);
 
-                var fruitRect = CreateRect(newX, newY, new SolidColorBrush(Colors.Green));
-                _fruitRectangles.Add(fruitRect);
-                _canvas.Children.Add(fruitRect);
+                _fruitRectangle = CreateRect(newX, newY, new SolidColorBrush(Colors.Green));
+                _canvas.Children.Add(_fruitRectangle);
 
                 generatedFruit = true;
             }
